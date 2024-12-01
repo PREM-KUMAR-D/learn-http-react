@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect , useCallback} from 'react';
 
 import MoviesList from './components/MoviesList';
 import './App.css';
@@ -9,40 +9,47 @@ function App() {
   const [isLoading,setIsLoading] = useState(false);
   const [error,setError] = useState(null);
 
-  const fetchMovieHandler =async ()=>{
-
+  
+  
+  const fetchMovieHandler =useCallback(async ()=>{
+    
     try {
       setIsLoading(true);
       setError(null);
       const res = await fetch('https://swapi.py4e.com/api/films');
       
+      
       if(!res.ok){
         throw new Error("Something went Wrong' to 'Something went wrong ....Retrying");
       }
-
+      
       const data = await res.json();
-
+      
       
       const transformedMovies = data.results.map((movie)=>{
-            return{
+        return{
               id: movie.episode_id,
               title: movie.title,
               openingText: movie.opening_crawl,
               releaseDate: movie.release_data,
             }
           })
-  
-      setMovies(transformedMovies);
-    } catch (error) {
-      console.log(error)
-      setError(error.message);
-    }
-    setIsLoading(false);
-    
-  }
+          
+          setMovies(transformedMovies);
+        } catch (error) {
+          console.log(error)
+          setError(error.message);
+        }
+        setIsLoading(false);
+        
+      },[]);
 
-  return (
-    <React.Fragment>
+      useEffect(()=>{
+        fetchMovieHandler();
+      },[fetchMovieHandler])
+      
+      return (
+        <React.Fragment>
       <section>
         <button onClick={fetchMovieHandler}>Fetch Movies</button>
       </section>
